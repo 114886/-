@@ -57,13 +57,35 @@ export default {
       }
       this.allTimes = this.formatTime(AllT);
     },
+
     getMonthTimes() {
       for (let i = 0; i < this.$store.state.timeList.length; i++) {
-        
+        const current = this.$store.state.timeList[i];
+        if (dayjs(new Date()).isSame(dayjs(current.createdAt), "month")) {
+          this.monthTimeList.push(current);
+        }
       }
-      dayjs(last.title).isSame(dayjs(current.createdAt), "day")
+      let AllT = 0;
+      for (let i = 0; i < this.monthTimeList.length; i++) {
+        AllT += this.monthTimeList[i].times;
+      }
+      this.monthTimes = this.formatTime(AllT);
     },
-    getWeekTimes() {},
+
+    getWeekTimes() {
+      for (let i = 0; i < this.$store.state.timeList.length; i++) {
+        const current = this.$store.state.timeList[i];
+        if (dayjs(new Date()).isSame(dayjs(current.createdAt), "week")) {
+          this.weekTimeList.push(current);
+        }
+      }
+      let AllT = 0;
+      for (let i = 0; i < this.weekTimeList.length; i++) {
+        AllT += this.weekTimeList[i].times;
+      }
+      this.weekTimes = this.formatTime(AllT);
+    },
+
     formatTime(seconds) {
       let hour =
         Math.floor(seconds / 3600) >= 10
