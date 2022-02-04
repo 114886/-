@@ -12,14 +12,18 @@
     <el-main>
       <First v-if="show1 === '1'"></First>
       <Time v-if="show1 === '2'"></Time>
+      <Notes v-if="show1 === '3'"></Notes>
+      <Detailed v-if="show1 === '4'"></Detailed>
     </el-main>
   </el-container>
 </template>
 <script>
 const First = () => import("../components/First.vue");
 const Time = () => import("../components/Time.vue");
+const Detailed = () => import("../components/Detailed.vue");
+const Notes = () => import("../components/Notes.vue");
 export default {
-  components: { First, Time },
+  components: { First, Time, Detailed, Notes },
   name: "Home",
   data() {
     return {

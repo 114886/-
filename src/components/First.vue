@@ -18,7 +18,7 @@
       <div class="up">
         <p>{{ NewDay }}</p>
         <p>距离考研还有</p>
-        <span>xxx天</span>
+        <span>{{ differenceTime }}</span>
       </div>
       <div class="down">每日一句</div>
     </div>
@@ -41,6 +41,11 @@ export default {
   computed: {
     NewDay() {
       return dayjs(new Date()).format("今天是YYYY年MM月DD日");
+    },
+    differenceTime() {
+      const date1 = dayjs("2022-12-24");
+      let date3 = date1.diff(new Date());
+      return Math.floor(date3 / 1000 / 3600 / 24) + "天";
     },
   },
   mounted() {

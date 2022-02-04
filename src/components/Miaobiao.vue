@@ -46,7 +46,6 @@ export default {
             type: "info",
             message: "取消输入",
           });
-          this.getTime();
         });
     },
     getTime(note) {
