@@ -86,7 +86,7 @@ export default {
       return hour + ":" + min + ":" + sec;
     },
     addTime() {
-      this.$prompt("请输入未记录的时长(单位:s)", "提示", {
+      this.$prompt("请输入未记录的时长(单位:min)", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
       })
@@ -114,7 +114,10 @@ export default {
             type: "success",
             message: "成功备注",
           });
-          this.$store.commit("createTime", { timeSecond: +times, note: value });
+          this.$store.commit("createTime", {
+            timeSecond: +times * 60,
+            note: value,
+          });
           this.init();
         })
         .catch(() => {
