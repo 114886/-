@@ -1,41 +1,93 @@
 <template>
   <div class="container">
     <h1>我的计划列表</h1>
-    <div>
-      <el-button id="start" @click="start" type="primary" plain
+    <div class="xxx">
+      <el-button
+        id="start"
+        @click="dialogFormVisible = true"
+        type="primary"
+        plain
         >添加计划</el-button
       >
       <el-button id="stop" @click="stop" type="danger" plain
         >清空计划</el-button
       >
+      <el-dialog title="添加计划" :visible.sync="dialogFormVisible">
+        <el-form :model="form">
+          <el-form-item label="计划内容" :label-width="formLabelWidth">
+            <el-input v-model="form.name" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="计划期限" :label-width="formLabelWidth">
+            <el-select v-model="form.region" placeholder="请选择计划期限">
+              <el-option label="长期" value="changqi"></el-option>
+              <el-option label="短期" value="duanqi"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="start">确 定</el-button>
+        </div>
+      </el-dialog>
     </div>
-    <ul>
-      <li v-for="item in todoList" :key="item.id">
-        <span :class="{ liActive: item.completed }">{{ item.notes }}</span>
-        <el-button
-          type="success"
-          icon="el-icon-check"
-          class="elButton"
-          circle
-          v-if="item.completed === true"
-          @click="show(item)"
-        ></el-button>
-        <el-button
-          type="warning"
-          class="elButton"
-          icon="el-icon-close"
-          circle
-          v-if="item.completed === false"
-          @click="show(item)"
-        ></el-button>
-        <el-button
-          type="danger"
-          icon="el-icon-delete"
-          circle
-          @click="removeTodo(item)"
-        ></el-button>
-      </li>
-    </ul>
+    <div class="left-right">
+      <ul>
+        <li v-if="changqiList.length !== 0"><h1>长期计划列表</h1></li>
+        <li v-for="item in changqiList" :key="item.id">
+          <span :class="{ liActive: item.completed }">{{ item.notes }}</span>
+          <el-button
+            type="success"
+            icon="el-icon-check"
+            class="elButton"
+            circle
+            v-if="item.completed === true"
+            @click="show(item)"
+          ></el-button>
+          <el-button
+            type="warning"
+            class="elButton"
+            icon="el-icon-close"
+            circle
+            v-if="item.completed === false"
+            @click="show(item)"
+          ></el-button>
+          <el-button
+            type="danger"
+            icon="el-icon-delete"
+            circle
+            @click="removeTodo(item)"
+          ></el-button>
+        </li>
+      </ul>
+      <ul>
+        <li v-if="duanqiList.length !== 0"><h1>短期计划列表</h1></li>
+        <li v-for="item in duanqiList" :key="item.id">
+          <span :class="{ liActive: item.completed }">{{ item.notes }}</span>
+          <el-button
+            type="success"
+            icon="el-icon-check"
+            class="elButton"
+            circle
+            v-if="item.completed === true"
+            @click="show(item)"
+          ></el-button>
+          <el-button
+            type="warning"
+            class="elButton"
+            icon="el-icon-close"
+            circle
+            v-if="item.completed === false"
+            @click="show(item)"
+          ></el-button>
+          <el-button
+            type="danger"
+            icon="el-icon-delete"
+            circle
+            @click="removeTodo(item)"
+          ></el-button>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -45,7 +97,21 @@ export default {
   data() {
     return {
       todoList: [],
+      dialogFormVisible: false,
+      formLabelWidth: "120px",
+      form: {
+        name: "",
+        region: "",
+      },
     };
+  },
+  computed: {
+    changqiList() {
+      return this.todoList.filter((t) => t.type === "changqi");
+    },
+    duanqiList() {
+      return this.todoList.filter((t) => t.type === "duanqi");
+    },
   },
   mounted() {
     this.$store.commit("fetchTodo");
@@ -84,26 +150,15 @@ export default {
         });
     },
     start() {
-      this.$prompt("请输入计划", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-      })
-        .then(({ value }) => {
-          this.$message({
-            type: "success",
-            message: "成功创建计划",
-          });
-          this.getTodo(value);
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消输入",
-          });
-        });
+      this.dialogFormVisible = false;
+      this.$message({
+        type: "success",
+        message: "成功创建计划",
+      });
+      this.getTodo(this.form);
     },
-    getTodo(note) {
-      this.$store.commit("createTodo", note);
+    getTodo(form) {
+      this.$store.commit("createTodo", { note: form.name, type: form.region });
       this.$store.commit("fetchTodo");
       this.todoList = this.$store.state.todoList;
     },
@@ -112,19 +167,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.elButton {
-  transition: all 1.5s;
-}
-.container {
+.left-right {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  > div {
-    padding: 30px 0;
-    width: 250px;
-    display: flex;
-    justify-content: space-between;
-  }
+  justify-content: space-between;
   > ul {
     display: flex;
     flex-direction: column;
@@ -139,6 +184,20 @@ export default {
         padding-right: 30px;
       }
     }
+  }
+}
+.elButton {
+  transition: all 1.5s;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  > .xxx {
+    padding: 30px 0;
+    width: 250px;
+    display: flex;
+    justify-content: space-between;
   }
 }
 h1 {

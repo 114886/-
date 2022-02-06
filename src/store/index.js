@@ -47,16 +47,20 @@ const store = new Vuex.Store({
       state.todoList = []
       store.commit('saveTodo')
     },
-    createTodo(state, note) {
+    createTodo(state, { note, type }) {
       store.commit('fetchTodo')
       const todoItem = {}
-      if (note === null) {
+      if (note === '') {
         note = '未详细说明'
+      }
+      if (type === '') {
+        type = 'changqi'
       }
       const id = createId().toString();
       todoItem.id = id
       todoItem.notes = note
       todoItem.completed = false
+      todoItem.type = type
       state.todoList.push(todoItem)
       store.commit('saveTodo')
     },
