@@ -69,6 +69,8 @@ const store = new Vuex.Store({
     createTime(state, { timeSecond, note }) {
       store.commit('fetchTimeList')
       const timeItem = {}
+      const id = createId().toString();
+      timeItem.id = id
       timeItem.createdAt = new Date()
       timeItem.times = timeSecond
       if (note === null) {
@@ -77,6 +79,21 @@ const store = new Vuex.Store({
       timeItem.notes = note
       state.timeList.push(timeItem)
       store.commit('saveTime')
+    },
+    removeTime(state, id) {
+      let index = -1;
+      for (let i = 0; i < state.timeList.length; i++) {
+        if (state.timeList[i].id === id) {
+          index = i;
+          break;
+        }
+      }
+      if (index >= 0) {
+        state.timeList.splice(index, 1);
+        store.commit('saveTime')
+      } else {
+        alert('操作失败,请联系qq:1148864234,备注:时长网页失效')
+      }
     },
     saveTime(state) {
       window.localStorage.setItem('timeList', JSON.stringify(state.timeList));
