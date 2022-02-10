@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import dayjs from "dayjs";
 export default {
   name: "Miaobiao",
   data() {
@@ -23,6 +24,9 @@ export default {
       m: 0,
       s: 0,
       ms: 0,
+      a: "",
+      c: "",
+      addtimes: 0,
       time: 0, //定时器
       str: "00:00:00",
       times: "0", //统计共多少秒时间
@@ -77,6 +81,7 @@ export default {
         });
     },
     start() {
+      document.addEventListener("visibilitychange", this.watchTimes);
       //开始
       this.$message({
         showClose: true,
@@ -89,6 +94,7 @@ export default {
 
     stop() {
       //暂停
+      document.removeEventListener("visibilitychange", this.watchTimes);
       this.$message({
         showClose: true,
         message: "暂停计时",
@@ -97,6 +103,7 @@ export default {
       });
       clearInterval(this.time);
     },
+
     reset() {
       //重置
       this.$confirm("此操作将重新置计时器, 是否继续?", "提示", {
@@ -124,28 +131,59 @@ export default {
         });
     },
     timer() {
+      if (document.visibilityState === "hidden") {
+        if (this.a === "") {
+          this.c = dayjs(new Date());
+        }
+        this.a = "1";
+      }
+      if (this.a !== "" && document.visibilityState === "visible") {
+        let b = dayjs(new Date());
+        this.a = "";
+        this.addtimes = Math.floor(b.diff(this.c) / 1000);
+      }
       //定义计时函数
-      this.ms = this.ms + 50; //毫秒
-      if (this.ms >= 1000) {
-        this.ms = 0;
-        this.s = this.s + 1; //秒
-      }
-      if (this.s >= 60) {
-        this.s = 0;
-        this.m = this.m + 1; //分钟
-      }
-      if (this.m >= 60) {
-        this.m = 0;
-        this.h = this.h + 1; //小时
-      }
-      this.str =
-        this.toDub(this.h) +
-        ":" +
-        this.toDub(this.m) +
-        ":" +
-        this.toDub(this.s);
+
       //统计共看了多少秒
-      this.times = this.s + this.m * 60 + this.h * 3600;
+      if (this.addtimes !== 0) {
+        this.times = this.s + this.m * 60 + this.h * 3600 + this.addtimes;
+        let c = Math.floor(this.addtimes / 3600);
+        let d = Math.floor(this.addtimes / 60);
+        let e = Math.floor(this.addtimes);
+        this.h += c;
+        this.addtimes = this.addtimes - c * 3600000;
+        this.m += d;
+        this.addtimes = this.addtimes - d * 60000;
+        this.s += e;
+        this.str =
+          this.toDub(this.h) +
+          ":" +
+          this.toDub(this.m) +
+          ":" +
+          this.toDub(this.s);
+        this.addtimes = 0;
+      } else {
+        this.ms = this.ms + 50; //毫秒
+        if (this.ms >= 1000) {
+          this.ms = 0;
+          this.s = this.s + 1; //秒
+        }
+        if (this.s >= 60) {
+          this.s = 0;
+          this.m = this.m + 1; //分钟
+        }
+        if (this.m >= 60) {
+          this.m = 0;
+          this.h = this.h + 1; //小时
+        }
+        this.str =
+          this.toDub(this.h) +
+          ":" +
+          this.toDub(this.m) +
+          ":" +
+          this.toDub(this.s);
+        this.times = this.s + this.m * 60 + this.h * 3600;
+      }
     },
     toDub(n) {
       //补0操作
